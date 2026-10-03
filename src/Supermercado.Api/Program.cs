@@ -66,6 +66,9 @@ app.MapScalarApiReference(options =>
 });
 app.MapGet("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
 
+// Health check de Render; no toca la BD porque sin contraseña no hay conexión.
+app.MapGet("/health", () => Results.Ok()).ExcludeFromDescription();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
