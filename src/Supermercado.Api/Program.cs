@@ -1,12 +1,10 @@
 using Supermercado.Api.Data;
+using Supermercado.Api.Infrastructure;
 using Supermercado.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
 
 // Database:Provider elige el motor: "Sqlite" (local y pruebas) o "MySql" (deploy).
 // La cadena se resuelve al crear el contexto para que las pruebas puedan sobrescribirla.
@@ -14,11 +12,26 @@ static string ConnectionString(IServiceProvider sp) =>
     sp.GetRequiredService<IConfiguration>().GetConnectionString("Supermercado")
     ?? throw new InvalidOperationException("Falta ConnectionStrings:Supermercado");
 
-var provider = builder.Configuration["Database:Provider"] ?? "Sqlite";
-if (provider.Equals("MySql", StringComparison.OrdinalIgnoreCase))
+var useMySql = string.Equals(builder.Configuration["Database:Provider"], "MySql", StringComparison.OrdinalIgnoreCase);
+
+// Sin contraseña en la configuración, quien use la API la manda en el encabezado X-Db-Password.
+var passwordFromHeader = useMySql
+    && DatabasePassword.IsMissingFrom(builder.Configuration.GetConnectionString("Supermercado") ?? "");
+
+builder.Services.AddControllers();
+builder.Services.AddOpenApi(options =>
+{
+    if (passwordFromHeader)
+    {
+        DatabasePassword.AddSecurityScheme(options);
+    }
+});
+builder.Services.AddHttpContextAccessor();
+
+if (useMySql)
 {
     builder.Services.AddDbContext<SupermercadoDbContext, MySqlSupermercadoDbContext>((sp, options) =>
-        options.UseMySQL(ConnectionString(sp)));
+        options.UseMySQL(DatabasePassword.ApplyTo(ConnectionString(sp), sp)));
 }
 else
 {
@@ -31,14 +44,26 @@ builder.Services.AddScoped<ProductService>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+if (passwordFromHeader)
 {
+    // Las migraciones se aplican con la primera petición que trae la contraseña.
+    app.UseMiddleware<DatabasePasswordMiddleware>();
+}
+else
+{
+    using var scope = app.Services.CreateScope();
     scope.ServiceProvider.GetRequiredService<SupermercadoDbContext>().Database.Migrate();
 }
 
 // Documentación interactiva siempre disponible para que se pueda probar desde el navegador.
 app.MapOpenApi();
-app.MapScalarApiReference();
+app.MapScalarApiReference(options =>
+{
+    if (passwordFromHeader)
+    {
+        options.AddPreferredSecuritySchemes(DatabasePassword.SchemeName);
+    }
+});
 app.MapGet("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
 
 app.UseHttpsRedirection();
