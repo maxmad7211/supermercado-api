@@ -1,0 +1,85 @@
+@host = http://localhost:5015
+
+### Crear categoría
+POST {{host}}/api/categories
+Content-Type: application/json
+
+{
+  "name": "Frutas y verduras",
+  "description": "Productos frescos del día"
+}
+
+### Crear categoría sin descripción
+POST {{host}}/api/categories
+Content-Type: application/json
+
+{
+  "name": "Lácteos"
+}
+
+### Nombre repetido (ignora mayúsculas) -> 409
+POST {{host}}/api/categories
+Content-Type: application/json
+
+{
+  "name": "LÁCTEOS"
+}
+
+### Listar categorías (INDEX)
+GET {{host}}/api/categories
+
+### Ver categoría con sus productos (SHOW)
+GET {{host}}/api/categories/1
+
+### Editar categoría
+PUT {{host}}/api/categories/1
+Content-Type: application/json
+
+{
+  "name": "Frutas, verduras y hortalizas",
+  "description": "Productos frescos del día"
+}
+
+### Crear producto
+POST {{host}}/api/products
+Content-Type: application/json
+
+{
+  "name": "Manzana roja",
+  "description": "Precio por kilo",
+  "categoryId": 1
+}
+
+### Crear producto
+POST {{host}}/api/products
+Content-Type: application/json
+
+{
+  "name": "Leche entera 1L",
+  "categoryId": 2
+}
+
+### Listar productos (incluye id y nombre de la categoría)
+GET {{host}}/api/products
+
+### Ver producto
+GET {{host}}/api/products/1
+
+### Editar producto (cambiando de categoría)
+PUT {{host}}/api/products/2
+Content-Type: application/json
+
+{
+  "name": "Leche deslactosada 1L",
+  "description": "Sin lactosa",
+  "categoryId": 2
+}
+
+### Eliminar categoría con productos -> 409
+DELETE {{host}}/api/categories/1
+
+### Eliminar producto
+DELETE {{host}}/api/products/1
+
+### Ahora sí se puede eliminar la categoría -> 204
+DELETE {{host}}/api/categories/1
