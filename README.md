@@ -3,6 +3,14 @@
 API REST en .NET 10 para administrar las categorías y los productos de un supermercado.
 Usa Entity Framework Core con SQLite y pruebas BDD (Gherkin) con Reqnroll.
 
+## Demo en línea
+
+**https://supermercado-api-1m3u.onrender.com**
+
+Abre la URL en el navegador para entrar a la documentación interactiva (Scalar), donde puedes probar cada endpoint.
+
+> Está en el plan gratuito de Render. Después de 15 minutos sin uso el servicio se duerme: la primera petición tarda cerca de un minuto y la base de datos empieza vacía.
+
 ## Requisitos
 
 - .NET SDK 10
