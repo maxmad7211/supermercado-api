@@ -60,6 +60,7 @@ else
 app.MapOpenApi();
 app.MapScalarApiReference(options =>
 {
+    options.ExpandAllTags(); // todos los endpoints visibles, sin "Show More"
     if (passwordFromHeader)
     {
         options.AddPreferredSecuritySchemes(DatabasePassword.SchemeName)

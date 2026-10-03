@@ -45,6 +45,14 @@ new("GET", "api/categories/{id}", "Ver categoría con sus productos (SHOW)", 200
         {
             document.Info.Title = "Supermercado API";
             document.Info.Description = Introduction(passwordRequired);
+
+            // Demo primero: el paso 0 (reinicio) es lo primero que se ve después de la introducción.
+            document.Tags = new HashSet<OpenApiTag>
+            {
+                new() { Name = "Demo", Description = "Paso 0: deja la base vacía y los ids en 1." },
+                new() { Name = "Categories" },
+                new() { Name = "Products" },
+            };
             return Task.CompletedTask;
         });
 
