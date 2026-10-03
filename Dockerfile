@@ -14,8 +14,11 @@ USER root
 RUN mkdir /data && chown app /data
 USER app
 
-# Render envía el tráfico al puerto 10000 por defecto.
+# Render envía el tráfico al puerto 10000 por defecto y termina HTTPS en su proxy;
+# ASPNETCORE_FORWARDEDHEADERS_ENABLED hace que la app respete X-Forwarded-Proto
+# para que la documentación apunte a https y no a http.
 ENV ASPNETCORE_HTTP_PORTS=10000 \
+    ASPNETCORE_FORWARDEDHEADERS_ENABLED=true \
     ConnectionStrings__Supermercado="Data Source=/data/supermercado.db"
 EXPOSE 10000
 
