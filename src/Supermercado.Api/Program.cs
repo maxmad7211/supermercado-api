@@ -21,6 +21,7 @@ var passwordFromHeader = useMySql
 builder.Services.AddControllers();
 builder.Services.AddOpenApi(options =>
 {
+    DemoGuide.Apply(options, passwordFromHeader);
     if (passwordFromHeader)
     {
         DatabasePassword.AddSecurityScheme(options);
@@ -61,7 +62,8 @@ app.MapScalarApiReference(options =>
 {
     if (passwordFromHeader)
     {
-        options.AddPreferredSecuritySchemes(DatabasePassword.SchemeName);
+        options.AddPreferredSecuritySchemes(DatabasePassword.SchemeName)
+            .EnablePersistentAuthentication(); // la contraseña se escribe una sola vez
     }
 });
 app.MapGet("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();

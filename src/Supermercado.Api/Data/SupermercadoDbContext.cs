@@ -9,6 +9,9 @@ public abstract class SupermercadoDbContext(DbContextOptions options) : DbContex
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
 
+    // Reiniciar los autoincrementales depende del motor.
+    public abstract Task ResetIdentityAsync(CancellationToken ct);
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Category>(category =>
