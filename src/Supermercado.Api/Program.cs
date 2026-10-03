@@ -8,9 +8,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+// Database:Provider elige el motor: "Sqlite" (local y pruebas) o "MySql" (deploy).
 // La cadena se resuelve al crear el contexto para que las pruebas puedan sobrescribirla.
-builder.Services.AddDbContext<SupermercadoDbContext>((sp, options) =>
-    options.UseSqlite(sp.GetRequiredService<IConfiguration>().GetConnectionString("Supermercado")));
+static string ConnectionString(IServiceProvider sp) =>
+    sp.GetRequiredService<IConfiguration>().GetConnectionString("Supermercado")
+    ?? throw new InvalidOperationException("Falta ConnectionStrings:Supermercado");
+
+var provider = builder.Configuration["Database:Provider"] ?? "Sqlite";
+if (provider.Equals("MySql", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddDbContext<SupermercadoDbContext, MySqlSupermercadoDbContext>((sp, options) =>
+        options.UseMySQL(ConnectionString(sp)));
+}
+else
+{
+    builder.Services.AddDbContext<SupermercadoDbContext, SqliteSupermercadoDbContext>((sp, options) =>
+        options.UseSqlite(ConnectionString(sp)));
+}
 
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ProductService>();

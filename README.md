@@ -1,7 +1,7 @@
 # Supermercado API
 
 API REST en .NET 10 para administrar las categorías y los productos de un supermercado.
-Usa Entity Framework Core con SQLite y pruebas BDD (Gherkin) con Reqnroll.
+Usa Entity Framework Core (MySQL en producción, SQLite en local) y pruebas BDD (Gherkin) con Reqnroll.
 
 ## Demo en línea
 
@@ -9,7 +9,9 @@ Usa Entity Framework Core con SQLite y pruebas BDD (Gherkin) con Reqnroll.
 
 Abre la URL en el navegador para entrar a la documentación interactiva (Scalar), donde puedes probar cada endpoint.
 
-> Está en el plan gratuito de Render. Después de 15 minutos sin uso el servicio se duerme: la primera petición tarda cerca de un minuto y la base de datos empieza vacía.
+Los datos se guardan en MySQL (Aiven), así que persisten entre reinicios.
+
+> Está en el plan gratuito de Render. Después de 15 minutos sin uso el servicio se duerme y la primera petición tarda cerca de un minuto.
 
 ## Requisitos
 
@@ -22,7 +24,18 @@ dotnet tool restore
 dotnet run --project src/Supermercado.Api
 ```
 
-La base de datos `supermercado.db` se crea y migra sola al arrancar.
+Por defecto usa SQLite: la base `supermercado.db` se crea y migra sola al arrancar.
+
+## Base de datos
+
+El motor se elige con configuración (variables de entorno o `appsettings.json`):
+
+| Variable                          | Valor                                              |
+|-----------------------------------|----------------------------------------------------|
+| `Database__Provider`              | `Sqlite` (por defecto) o `MySql`                   |
+| `ConnectionStrings__Supermercado` | Cadena de conexión del motor elegido               |
+
+Cada motor tiene sus propias migraciones en `src/Supermercado.Api/Data/Migrations/` y se aplican solas al arrancar.
 En `src/Supermercado.Api/Supermercado.Api.http` hay peticiones de ejemplo.
 
 ## Pruebas BDD

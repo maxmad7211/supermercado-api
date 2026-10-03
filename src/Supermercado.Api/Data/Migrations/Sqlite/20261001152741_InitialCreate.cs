@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Supermercado.Api.Data.Migrations
+namespace Supermercado.Api.Data.Migrations.Sqlite
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

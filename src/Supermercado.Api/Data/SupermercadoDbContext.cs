@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Supermercado.Api.Data;
 
-public class SupermercadoDbContext(DbContextOptions<SupermercadoDbContext> options) : DbContext(options)
+// Modelo común; cada motor tiene su contexto derivado con sus propias migraciones.
+public abstract class SupermercadoDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
