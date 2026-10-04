@@ -33,9 +33,11 @@ El motor se elige con configuración (variables de entorno o `appsettings.json`)
 | Variable                          | Valor                                              |
 |-----------------------------------|----------------------------------------------------|
 | `Database__Provider`              | `Sqlite` (por defecto) o `MySql`                   |
-| `ConnectionStrings__Supermercado` | Cadena de conexión del motor elegido               |
+| `ConnectionStrings__Supermercado` | Cadena de conexión del motor elegido. Para MySQL también acepta el Service URI de Aiven (`mysql://usuario:contraseña@host:puerto/bd?ssl-mode=REQUIRED`) |
 
 Cada motor tiene sus propias migraciones en `src/Supermercado.Api/Data/Migrations/` y se aplican solas al arrancar.
+
+En producción (`appsettings.Production.json`) el motor es MySQL. La contraseña no está en el repositorio: se configura en Render con la variable `ConnectionStrings__Supermercado`. Si la cadena no trae contraseña, la API la pide en el encabezado `X-Db-Password` y Scalar muestra un campo para escribirla.
 En `src/Supermercado.Api/Supermercado.Api.http` hay peticiones de ejemplo.
 
 ## Pruebas BDD

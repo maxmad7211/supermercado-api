@@ -14,7 +14,13 @@ static string ConnectionString(IServiceProvider sp) =>
 
 var useMySql = string.Equals(builder.Configuration["Database:Provider"], "MySql", StringComparison.OrdinalIgnoreCase);
 
-// Sin contraseña en la configuración, quien use la API la manda en el encabezado X-Db-Password.
+if (useMySql && builder.Configuration.GetConnectionString("Supermercado") is { } configured)
+{
+    builder.Configuration["ConnectionStrings:Supermercado"] = MySqlUri.ToConnectionString(configured);
+}
+
+// Lo normal es que la contraseña venga en la configuración (variable de entorno en Render).
+// Si no viene, quien use la API la manda en el encabezado X-Db-Password.
 var passwordFromHeader = useMySql
     && DatabasePassword.IsMissingFrom(builder.Configuration.GetConnectionString("Supermercado") ?? "");
 
